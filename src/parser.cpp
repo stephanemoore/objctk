@@ -119,7 +119,8 @@ static _objctk_typenode_ptr parseTypeFromToken(objctk_parserstate *parserState, 
     case OBJCTKTokenNamePointerType: {
       objctk_token nextToken = lexer_nextToken(&(parserState->lexerState));
       _objctk_typenode_ptr subtypeNode = parseTypeFromToken(parserState, nextToken);
-      typeNode = _objctk_typenode_ptr(new pointernode(token.value, OBJCTKTypeCategoryPointer, subtypeNode));
+      objctk_substring fullSubstring = mergedLexeme(token.value, subtypeNode->substring());
+      typeNode = _objctk_typenode_ptr(new pointernode(fullSubstring, OBJCTKTypeCategoryPointer, subtypeNode));
       break;
     }
     case OBJCTKTokenNameBitfieldType: {
