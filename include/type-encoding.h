@@ -47,6 +47,12 @@ OBJCTK_ENUM(objctk_statuscode, signed int,
 /** Returns the type category of a type node. */
 OBJCTK_EXTERN objctk_typecategory objctk_typenode_getTypeCategory(objctk_typenode node);
 
+/**
+ * Returns the size of the type represented by the type node or -1 if the size of the type cannot
+ * be determined.
+ */
+OBJCTK_EXTERN int objctk_typenode_getTypeSize(objctk_typenode node);
+
 /** Returns the range that the type node occupies in the type encoding from which it was parsed. */
 OBJCTK_EXTERN objctk_range objctk_typenode_getRange(objctk_typenode node);
 

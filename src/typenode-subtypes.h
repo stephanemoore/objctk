@@ -38,6 +38,15 @@ class bitfieldnode : public _objctk_typenode {
   const size_t m_size;
 public:
   bitfieldnode(const objctk_substring substring, size_t size) : _objctk_typenode(substring, OBJCTKTypeCategoryBitField), m_size(size) {}
+  int typeSize() {
+    size_t byteSize = sizeof(char);
+    int numberOfBytes = m_size / byteSize;
+    int bitRemainder = m_size % byteSize;
+    if (bitRemainder != 0) {
+      numberOfBytes += 1;
+    }
+    return numberOfBytes;
+  }
 };
 
 /**
@@ -49,6 +58,7 @@ public:
   pointernode(const objctk_substring substring, const objctk_typecategory typeCategory, const _objctk_typenode_ptr typeNode) : _objctk_typenode(substring, typeCategory), m_referenced_type(typeNode) {}
 
   virtual _objctk_typenode_ptr referencedType() { return m_referenced_type; }
+  int typeSize() { return sizeof(void *); }
 };
 
 /**
@@ -58,6 +68,10 @@ class arraynode : public pointernode {
   const size_t m_size;
 public:
   arraynode(const objctk_substring substring, const _objctk_typenode_ptr node, const size_t size) : pointernode(substring, OBJCTKTypeCategoryArray, node), m_size(size) {}
+  int typeSize() {
+    _objctk_typenode_ptr referencedType = this->referencedType();
+    return m_size * referencedType->typeSize();
+  }
 };
 
 /**
@@ -69,6 +83,7 @@ public:
   objectpointernode(const objctk_substring substring, const objctk_substring typeName) : _objctk_typenode(substring, OBJCTKTypeCategoryObject), m_type_name(typeName) {}
 
   virtual objctk_substring typeName() { return m_type_name; }
+  int typeSize() { return sizeof(void *); }
 };
 
 /**
@@ -82,6 +97,22 @@ public:
 
   virtual objctk_substring typeName() { return m_type_name; }
   virtual _objctk_typenode_list memberTypes() { return m_member_types; }
+  int typeSize() {
+    _objctk_typenode_list list = this->memberTypes();
+    int totalSize = 0;
+    int largestMemberTypeSize = 0;
+    for (_objctk_typenode_list::iterator iter = list.begin(); iter != list.end(); iter++) {
+      _objctk_typenode_ptr typeNodePtr = *iter;
+      int memberTypeSize = typeNodePtr->typeSize();
+      largestMemberTypeSize = std::max(largestMemberTypeSize, memberTypeSize);
+      totalSize += memberTypeSize;
+    }
+    objctk_typecategory typeCategory = this->typeCategory();
+    if (typeCategory == OBJCTKTypeCategoryUnion) {
+      return largestMemberTypeSize;
+    }
+    return totalSize;
+  }
 };
 
 }

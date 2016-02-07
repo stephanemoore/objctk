@@ -46,6 +46,11 @@ objctk_typecategory objctk_typenode_getTypeCategory(objctk_typenode node) {
   return node->typeCategory();
 }
 
+int objctk_typenode_getTypeSize(objctk_typenode node) {
+  OBJCTK_EARLY_RETURN_ON_NULL(node, -1);
+  return node->typeSize();
+}
+
 objctk_range objctk_typenode_getRange(objctk_typenode node) {
   OBJCTK_EARLY_RETURN_ON_NULL(node, invalidRange());
   return node->substring();

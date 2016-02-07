@@ -49,6 +49,38 @@ public:
 
   objctk_substring substring() { return m_substring; }
 
+  virtual int typeSize() {
+    objctk_typecategory typeCategory = this->typeCategory();
+    switch (typeCategory) {
+      case OBJCTKTypeCategorySignedChar:
+      case OBJCTKTypeCategoryUnsignedChar:
+        return sizeof(char);
+      case OBJCTKTypeCategorySignedInt:
+      case OBJCTKTypeCategoryUnsignedInt:
+        return sizeof(int);
+      case OBJCTKTypeCategorySignedShort:
+      case OBJCTKTypeCategoryUnsignedShort:
+        return sizeof(short);
+      case OBJCTKTypeCategorySignedLong:
+      case OBJCTKTypeCategoryUnsignedLong:
+        return sizeof(long);
+      case OBJCTKTypeCategorySignedLongLong:
+      case OBJCTKTypeCategoryUnsignedLongLong:
+        return sizeof(long long);
+      case OBJCTKTypeCategoryFloat:
+        return sizeof(float);
+      case OBJCTKTypeCategoryDouble:
+        return sizeof(double);
+      case OBJCTKTypeCategoryBool:
+        return sizeof(char);
+      case OBJCTKTypeCategoryVoid:
+        return 0;
+      default:
+        break;
+    }
+    return -1;
+  }
+
   virtual objctk_substring typeName() { return makeRange(0, 0); }
 
   virtual _objctk_typenode_ptr referencedType() { return nullptr; }
