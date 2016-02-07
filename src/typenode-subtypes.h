@@ -57,7 +57,7 @@ public:
 class arraynode : public pointernode {
   const size_t m_size;
 public:
-  arraynode(const objctk_substring substring, const _objctk_typenode_ptr Node, const size_t size) : pointernode(substring, OBJCTKTypeCategoryArray, Node), m_size(size) {}
+  arraynode(const objctk_substring substring, const _objctk_typenode_ptr node, const size_t size) : pointernode(substring, OBJCTKTypeCategoryArray, node), m_size(size) {}
 };
 
 /**
