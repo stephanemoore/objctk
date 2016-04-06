@@ -91,6 +91,40 @@ objctk_typenode *objctk_typenode_copyMemberTypeList(objctk_typenode node, unsign
   return memberTypeList;
 }
 
+// TODO: Determine whether this function can be made reliable enough to consider evolving it into a public API.
+void objctk_enumerateMemberValues(
+    void *address,
+    objctk_typenode node,
+    void (*enumerationFunction)(void *address, objctk_typenode node, void *context)) {
+  if ((address == NULL) || (node == NULL) || (enumerationFunction == NULL)) {
+    return;
+  }
+
+  _objctk_typenode_list list = node->memberTypes();
+  int offset = 0;
+  for (_objctk_typenode_list::iterator iter = list.begin(); iter != list.end(); iter++) {
+    _objctk_typenode_ptr memberTypeNodePtr = *iter;
+
+    // Calculate the offset to the member value.
+    int memberTypeSize = memberTypeNodePtr->typeSize();
+    if (memberTypeSize == -1) {
+      // Unable to continue further.
+      return;
+    }
+
+    // Calculate the offset to the member based on:
+    // • C99 §6.7.2.1
+    // • An undocumented assumption that compilers generally target alignment to the type's size.
+    int alignmentOffset = (offset % memberTypeSize);
+    if (alignmentOffset != 0) {
+      offset += (memberTypeSize - alignmentOffset);
+    }
+    char *memberValueAddress = ((char *)address) + offset;
+    enumerationFunction(memberValueAddress, memberTypeNodePtr.get(), NULL);
+    offset += memberTypeSize;
+  }
+}
+
 objctk_typeparseresult objctk_parseTypeEncoding(const char *typeEncoding) {
   OBJCTK_EARLY_RETURN_ON_NULL(typeEncoding, NULL);
   objctk_typeparseresult parseResult = new _objctk_typeparseresult();
